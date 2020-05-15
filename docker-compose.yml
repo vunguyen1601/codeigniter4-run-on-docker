@@ -1,0 +1,36 @@
+version: '3.7'
+services:
+    mysql5.7_dev:
+        image: mysql:5.7
+        restart: always
+        #ports:
+        #  - 31306:3306
+        environment:
+          - MYSQL_DATABASE=test
+          - MYSQL_USER=test
+          - MYSQL_PASSWORD=test123
+          - MYSQL_ROOT_PASSWORD=test123!@#456@root
+          - TZ=UTC
+        command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
+        volumes:
+          #- ./mysql_data_pro:/var/lib/mysql
+          - ./mysql-dump:/docker-entrypoint-initdb.d
+        networks:
+          - pronet
+
+    apache_app:
+        image: vunt/php7_imagemagick_gd:php-7.4
+        restart: always
+        ports:
+          - 3081:80
+        depends_on:
+          - mysql5.7_dev
+        volumes:
+         - .:/var/www/html:rw
+        networks:
+         - pronet
+
+networks:
+  pronet:
+    driver: bridge
+
